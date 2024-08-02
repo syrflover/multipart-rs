@@ -2,11 +2,11 @@ use bytes::Bytes;
 use http::{header::HeaderName, HeaderMap, HeaderValue};
 
 /// from content_type
-pub fn parse_boundary<'a>(header_value: &'a HeaderValue) -> Option<&'a [u8]> {
+pub fn parse_boundary(header_value: &HeaderValue) -> Option<String> {
     let bytes = header_value.as_bytes();
     let pos = memchr::memmem::find(bytes, b"boundary=")?;
 
-    Some(&bytes[(pos + 9)..])
+    String::from_utf8(bytes[(pos + 9)..].to_vec()).ok()
 }
 
 pub struct Multipart<'a> {
