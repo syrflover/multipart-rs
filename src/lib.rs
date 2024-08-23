@@ -28,8 +28,8 @@ impl<'a> Multipart<'a> {
             .collect::<Vec<u8>>();
 
         // twoway
-        let pos = memchr::memmem::find(&bytes, &boundary).unwrap() + boundary.len(); // ignore first boundary
-        let end = memchr::memmem::rfind(&bytes, &boundary).unwrap(); // end boundary position
+        let pos = memchr::memmem::find(bytes, &boundary).unwrap() + boundary.len(); // ignore first boundary
+        let end = memchr::memmem::rfind(bytes, &boundary).unwrap(); // end boundary position
 
         // println!("pos = {pos}");
         // println!("end = {end}");
@@ -44,7 +44,7 @@ impl<'a> Multipart<'a> {
 }
 
 impl<'a> Iterator for Multipart<'a> {
-    type Item = (HeaderMap, Vec<u8>);
+    type Item = (HeaderMap, &'a [u8]);
 
     fn next(&mut self) -> Option<Self::Item> {
         let end = self.pos + memchr::memmem::find(&self.bytes[self.pos..], &self.boundary)?;
@@ -96,7 +96,9 @@ impl<'a> Iterator for Multipart<'a> {
         }
 
         // crlf_pos + "\r\n\r\n".len()
-        let body = r[(crlf_pos + 4)..].to_vec();
+        let body = &r[(crlf_pos + 4)..r.len() - 2];
+
+        // tracing::trace!(?body);
 
         // println!("headers = {}", String::from_utf8(headers.to_vec()).unwrap());
         // println!("body = {}", String::from_utf8(body.to_vec()).unwrap());
@@ -188,7 +190,7 @@ Vary: Referer
             println!("Content-ID: {content_id}");
             println!();
 
-            let a = String::from_utf8(a).unwrap();
+            let a = String::from_utf8(a.to_vec()).unwrap();
 
             let r = a.contains('\r');
 
