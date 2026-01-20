@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bytes = "1.7"
-http = "1.1"
-memchr = "2.7"
+bytes = "1"
+http = "1"
+memchr = "2"
